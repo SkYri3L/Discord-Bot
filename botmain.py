@@ -1,6 +1,5 @@
 # Verison : 0.0.2
 #Author : SkYri3L
-
 import os
 import sys
 import discord
