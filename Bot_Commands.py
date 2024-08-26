@@ -9,7 +9,6 @@ RESTART_STATUS_FILE = "restart_status.txt"
 Status_Name = 'Your tears'
 act_type = discord.ActivityType.listening
 
-guild = discord.object(id=1277333357411303435)
 
 if platform.system() == "Windows":
     os.system("cls")
