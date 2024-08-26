@@ -67,17 +67,17 @@ class BotsCommand:
 
 # Get User ID and Username
     @staticmethod
-    def interuserid(inter: discord.Interaction, command_name: str):
+    def interuserid(inter: discord.Interaction, command_name: str, Perm:str):
         username = inter.user.name
         user_id = inter.user.id
-        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}')
+        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}\nPerm:{Perm}')
         return user_id, username
     
     @staticmethod
-    def ctxuserid(ctx: commands.Context, command_name:str):
+    def ctxuserid(ctx: commands.Context, command_name:str, Perm:str):
         user_id = ctx.message.author.id
         username = ctx.message.author.name
-        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}')
+        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}\nPerm:{Perm}')
         return user_id, username
 
 # NOT COMMANDS 

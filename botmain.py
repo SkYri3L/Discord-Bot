@@ -12,6 +12,8 @@ from Bot_Commands import BotsCommand, handle_restart_status, change_status
 
 # Empty variables
 command_name = ''
+Perm = ''
+default = "defualt"
 
 # Load environment variables
 load_dotenv()
@@ -46,53 +48,61 @@ bot.tree.add_command(admin_group)
 async def sync(ctx: commands.Context) -> None:
     command_name ="Prefix Sync"
     """Sync commands"""
-    BotsCommand.ctxuserid(ctx, command_name)
     if is_bot_owner(ctx):
         print('prefix Sync')
         await BotsCommand.Admin.sync2(bot, ctx)
+        Perm = True
     else:
         #CHECKS FOR PERMISSION
         await ctx.send("You do not have permission to use this command.")
+        Perm = False
+    BotsCommand.ctxuserid(ctx, command_name, Perm)
 
 
 @admin_group.command(name='sync', description='Sync Commands OwnerOnly')
 async def sync(inter: discord.Interaction) -> None:
     command_name = "Slash Sync"
-    BotsCommand.interuserid(inter, command_name)
     if inter.user.id == OWNER_ID:
         await BotsCommand.Admin.sync(bot, inter) 
+        Perm = True
     else:
         #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
+        Perm = False
+    BotsCommand.interuserid(inter, command_name, Perm)
 
 @admin_group.command(name="poweroff", description="Poweroff Bot OwnerOnly")
 async def poweroff(inter: discord.Interaction) -> None:
     command_name = "Power Off Bot"
-    BotsCommand.interuserid(inter, command_name)
     if inter.user.id == OWNER_ID:
         await BotsCommand.Admin.poweroff(bot, inter) 
+        Perm = True
     else:
         #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
+        Perm= False
+    BotsCommand.interuserid(inter, command_name, Perm)
 
 @admin_group.command(name="restart", description='Restart bot OwnerOnly')
 async def restarting(inter: discord.Interaction) -> None:
     command_name = "restart"
-    BotsCommand.interuserid(inter, command_name)
     if inter.user.id == OWNER_ID:
         await BotsCommand.Admin.bot_restart(bot, inter)
         username = inter.user.name
         user_id = inter.user.id
-        print(f'User: {username}\n ID: {user_id}\n used slash command restart') 
+        Perm = True
     else:
         #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
+        Perm = False
+    BotsCommand.interuserid(inter, command_name, Perm)
 
 # DEFAULT USERS COMMANDS
 @bot.tree.command(name="ping", description="Ping's bot latency")
 async def ping(inter: discord.Interaction) -> None:
     command_name = "Ping"
-    BotsCommand.interuserid(inter, command_name)  
+    Perm = default
+    BotsCommand.interuserid(inter, command_name, Perm)  
     await BotsCommand.users.ping(inter, bot)
     
 
@@ -103,7 +113,8 @@ bot.tree.add_command(group)  # adds group commands into command tree
 @group.command(name="add", description="Add two numbers")
 async def add(inter: discord.Interaction, a: int, b: int) -> None:
     command_name = "add"
-    BotsCommand.interuserid(inter, command_name)
+    Perm = default
+    BotsCommand.interuserid(inter, command_name, Perm)
     await BotsCommand.users.add(inter, a, b)
 
 bot.run(TOKEN)
