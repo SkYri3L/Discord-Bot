@@ -1,31 +1,62 @@
+# Verison : 0.0.2
+#Author : SkYri3L
+
+import os
+import sys
 import discord
-import time
+from discord.ext import commands
+from dotenv import load_dotenv
+from Bot_Commands import BotsCommand, handle_restart_status, change_status
 
-# Read token from file
-with open ("token.txt", "r") as file:
-    bot_token = file.read().strip() # removeds any whitespace
+# Load environment variables
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
 
-
+# Configure bot intents and commands
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
+intents.guild_messages = True
+intents.dm_messages = True
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"), intents=intents)
 
-client = discord.Client(intents=intents)
-
-@client.event
-async def on_ready():
-    print(f'We have logged in as {client.user}')
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-    
-    if message.content.startswith('!powerdown'):
-        await message.channel.send('Bot shutting down')
-        await client.close()
+#LOADS ON BOT OPEN
+@bot.event
+async def on_ready() -> None:
+    print(f"Logged in as {bot.user}")
+    await handle_restart_status(bot)
+    await change_status(bot)
 
 
-client.run(bot_token)
+#ADMIN COMMANDS
+
+@bot.command()
+async def sync(ctx: commands.Context) -> None:
+    """Sync commands"""
+    await BotsCommand.Admin.sync(bot, ctx.interaction) 
+
+@bot.tree.command(name='sync', description='Sync Commands OwnerOnly')
+async def sync(inter: discord.Interaction) -> None:
+    await BotsCommand.Admin.sync(bot, inter) 
+
+@bot.tree.command(name="poweroff", description="Poweroff Bot OwnerOnly")
+async def poweroff(inter: discord.Interaction) -> None:
+    await BotsCommand.Admin.poweroff(bot, inter) 
+
+@bot.tree.command(name="restart", description='Restart bot OwnerOnly')
+async def restarting(inter: discord.Interaction) -> None:
+    await BotsCommand.Admin.bot_restart(bot, inter) 
+
+
+
+#DEFAULT USERS COMMANDS
+
+@bot.tree.command(name="ping", description="Ping's bot latency")
+async def ping(inter: discord.Interaction) -> None:
+    await BotsCommand.users.ping(inter, bot) 
+
+
+
+
+
+bot.run(TOKEN)

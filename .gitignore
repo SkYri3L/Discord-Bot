@@ -1,1 +1,4 @@
-token.txt
+.env
+venv
+restart_status.txt
+__pycache__
