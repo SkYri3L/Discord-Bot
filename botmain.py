@@ -51,6 +51,7 @@ async def sync(ctx: commands.Context) -> None:
         print('prefix Sync')
         await BotsCommand.Admin.sync2(bot, ctx)
     else:
+        #CHECKS FOR PERMISSION
         await ctx.send("You do not have permission to use this command.")
 
 
@@ -61,6 +62,7 @@ async def sync(inter: discord.Interaction) -> None:
     if inter.user.id == OWNER_ID:
         await BotsCommand.Admin.sync(bot, inter) 
     else:
+        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
 
 @admin_group.command(name="poweroff", description="Poweroff Bot OwnerOnly")
@@ -70,6 +72,7 @@ async def poweroff(inter: discord.Interaction) -> None:
     if inter.user.id == OWNER_ID:
         await BotsCommand.Admin.poweroff(bot, inter) 
     else:
+        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
 
 @admin_group.command(name="restart", description='Restart bot OwnerOnly')
@@ -82,6 +85,7 @@ async def restarting(inter: discord.Interaction) -> None:
         user_id = inter.user.id
         print(f'User: {username}\n ID: {user_id}\n used slash command restart') 
     else:
+        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
 
 # DEFAULT USERS COMMANDS
