@@ -2,30 +2,26 @@ import os
 import sys
 import platform
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 # File to store the restart status
 RESTART_STATUS_FILE = "restart_status.txt"
-Status_Name = 'Your tears'
-act_type = discord.ActivityType.listening
-
+STATUS_NAME = 'Your tears'
+ACTIVITY_TYPE = discord.ActivityType.listening
 
 if platform.system() == "Windows":
     os.system("cls")
 else:
     os.system("clear")
 
-
 class BotsCommand:
     class Admin:
-
-        #Powersoff Bot
         @staticmethod
-        async def poweroff(bot, inter:discord.Interaction) -> None:
+        async def poweroff(bot, inter: discord.Interaction) -> None:
             await inter.response.send_message("Powering off Bot")
             await bot.close()
 
-        #Sync's Commands global to discord
         @staticmethod
         async def sync(bot, inter: discord.Interaction) -> None:
             try:
@@ -36,7 +32,11 @@ class BotsCommand:
                 await inter.response.send_message(f"Failed to sync commands: {e}")
                 print(f"Error syncing commands: {e}")
 
-        #Restarts the bot
+        @staticmethod
+        async def sync2(bot, ctx: commands.Context) -> None:
+            synced = await bot.tree.sync()
+            print(f"Synced {len(synced)} commands globally")
+
         @staticmethod
         async def bot_restart(bot, inter: discord.Interaction) -> None:
             await inter.response.send_message("Restarting bot...")
@@ -54,24 +54,37 @@ class BotsCommand:
             os.execv(sys.executable, ['python'] + sys.argv) 
 
     class users:
-        #Pings bots latency
+        @staticmethod
+        async def add(inter: discord.Interaction, a: int, b: int) -> None:
+            await inter.response.send_message(f"{a} + {b} = {a + b}")
+            print(f"{a} + {b} = {a + b}")
+
         @staticmethod
         async def ping(inter: discord.Interaction, bot) -> None:
             await inter.response.send_message(f"Pong! {round(bot.latency * 1000)}ms")
             print(f"Ping is {round(bot.latency * 1000)}ms")
 
+    @staticmethod
+    async def interuserid(inter: discord.Interaction):
+        username = inter.user.name
+        user_id = inter.user.id
+        await inter.response.send_message(f'User: {username}\n ID: {user_id}')
+        return user_id, username
+    
+    @staticmethod
+    async def ctxuserid(ctx: commands.Context):
+        user_id = ctx.message.author.id
+        username = ctx.message.author.name
+        await ctx.send(f'User: {username}\nID: {user_id}')
+        return user_id, username
 
-
-#NOT COMMANDS 
-
-
+# NOT COMMANDS 
 async def change_status(bot) -> None:
-    await bot.change_presence(activity=discord.Activity(type=act_type, name=Status_Name))
-    print('Status has been set to "', str(act_type).replace('ActivityType.', ''),'to', Status_Name,'"')
+    await bot.change_presence(activity=discord.Activity(type=ACTIVITY_TYPE, name=STATUS_NAME))
+    print(f'Status has been set to "{str(ACTIVITY_TYPE).replace("ActivityType.", "")}" to "{STATUS_NAME}"')
 
 async def handle_restart_status(bot) -> None:
     if os.path.exists(RESTART_STATUS_FILE):
-
         try:
             with open(RESTART_STATUS_FILE, 'r') as f:
                 user_id, channel_id, context = f.read().strip().split(',')
