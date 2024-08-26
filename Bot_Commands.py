@@ -64,18 +64,20 @@ class BotsCommand:
             await inter.response.send_message(f"Pong! {round(bot.latency * 1000)}ms")
             print(f"Ping is {round(bot.latency * 1000)}ms")
 
+
+# Get User ID and Username
     @staticmethod
-    async def interuserid(inter: discord.Interaction):
+    def interuserid(inter: discord.Interaction, command_name: str):
         username = inter.user.name
         user_id = inter.user.id
-        await inter.response.send_message(f'User: {username}\n ID: {user_id}')
+        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}')
         return user_id, username
     
     @staticmethod
-    async def ctxuserid(ctx: commands.Context):
+    def ctxuserid(ctx: commands.Context, command_name:str):
         user_id = ctx.message.author.id
         username = ctx.message.author.name
-        await ctx.send(f'User: {username}\nID: {user_id}')
+        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}')
         return user_id, username
 
 # NOT COMMANDS 
