@@ -1,10 +1,8 @@
 # Version: 0.0.3
 # Author: SkYri3l
 
-
-import os
-import sys
-import discord
+import os, sys, discord
+from botlog import BotsLog
 from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
@@ -40,10 +38,13 @@ async def on_ready() -> None:
     await handle_restart_status(bot)
     await change_status(bot)
 
+###
+
 # ADMIN COMMANDS
 admin_group = app_commands.Group(name="admin", description="Admin Commands")
 bot.tree.add_command(admin_group)
 
+#Sync Commands (prefix)
 @bot.command()
 async def sync(ctx: commands.Context) -> None:
     command_name ="Prefix Sync"
@@ -53,12 +54,31 @@ async def sync(ctx: commands.Context) -> None:
         await BotsCommand.Admin.sync2(bot, ctx)
         Perm = True
     else:
-        #CHECKS FOR PERMISSION
         await ctx.send("You do not have permission to use this command.")
         Perm = False
-    BotsCommand.ctxuserid(ctx, command_name, Perm)
+    BotsLog.ctxlog(ctx, command_name, Perm)
 
+#Shows botlogs
+@admin_group.command(name="showlogs", description="Show recent bot logs")
+async def show_logs(inter: discord.Interaction) -> None:
+    command_name = "Show Logs"
+    if inter.user.id == OWNER_ID:
+        embed = discord.Embed(title="Bot Logs", description="Command Usage Statistics", color=discord.Color.dark_purple())
 
+        for user_id, commands in BotsLog.command_usage.items():
+            user_name = await bot.fetch_user(user_id)  # Get the username from the user ID
+            command_stats = "\n".join([f"{cmd}: {count} times" for cmd, count in commands.items()])
+            
+            embed.add_field(name=f"{user_name}", value=f"```{command_stats}```", inline=False)
+        
+        await inter.response.send_message(embed=embed)
+        Perm = True
+    else:
+        await inter.response.send_message("You do not have permission to use this command.")
+        Perm = False
+    BotsLog.interlog(inter, command_name, Perm)
+
+#Sync's Commands
 @admin_group.command(name='sync', description='Sync Commands OwnerOnly')
 async def sync(inter: discord.Interaction) -> None:
     command_name = "Slash Sync"
@@ -66,23 +86,23 @@ async def sync(inter: discord.Interaction) -> None:
         await BotsCommand.Admin.sync(bot, inter) 
         Perm = True
     else:
-        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
         Perm = False
-    BotsCommand.interuserid(inter, command_name, Perm)
+    BotsLog.interlog(inter, command_name, Perm)
 
+#Poweroff Commands
 @admin_group.command(name="poweroff", description="Poweroff Bot OwnerOnly")
 async def poweroff(inter: discord.Interaction) -> None:
     command_name = "Power Off Bot"
     if inter.user.id == OWNER_ID:
-        await BotsCommand.Admin.poweroff(bot, inter) 
+        await BotsLog.Admin.poweroff(bot, inter) 
         Perm = True
     else:
-        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
         Perm= False
-    BotsCommand.interuserid(inter, command_name, Perm)
+    BotsLog.interlog(inter, command_name, Perm)
 
+#Restarts Bot 
 @admin_group.command(name="restart", description='Restart bot OwnerOnly')
 async def restarting(inter: discord.Interaction) -> None:
     command_name = "restart"
@@ -92,17 +112,39 @@ async def restarting(inter: discord.Interaction) -> None:
         user_id = inter.user.id
         Perm = True
     else:
-        #CHECKS FOR PERMISSION
         await inter.response.send_message("You do not have permission to use this command.")
         Perm = False
-    BotsCommand.interuserid(inter, command_name, Perm)
+    BotsLog.interlog(inter, command_name, Perm)
+
+
+#
+@admin_group.command(name="Make Roles", description="Creates a role and add's it to a user")
+async def mkrole(inter: discord.Interaction, rname: str, rcolour: int, ) -> None:
+    command_name = "Make Role"
+    if inter.user.id == OWNER_ID:
+        await BotsCommand.admin.makerole(bot, inter, rname, rcolour)
+        username = inter.user.name
+        user_id = inter.user.id
+        Perm = True
+    else:
+        await inter.response.send_message("You do not have permission to use this command.")
+        Perm = False
+    BotsLog.interlog(inter, command_name, Perm)
+
+#
+
+
+###
+
 
 # DEFAULT USERS COMMANDS
+
+#Ping slash commands
 @bot.tree.command(name="ping", description="Ping's bot latency")
 async def ping(inter: discord.Interaction) -> None:
     command_name = "Ping"
     Perm = default
-    BotsCommand.interuserid(inter, command_name, Perm)  
+    BotsLog.interlog(inter, command_name, Perm)  
     await BotsCommand.users.ping(inter, bot)
     
 
@@ -114,7 +156,7 @@ bot.tree.add_command(group)  # adds group commands into command tree
 async def add(inter: discord.Interaction, a: int, b: int) -> None:
     command_name = "add"
     Perm = default
-    BotsCommand.interuserid(inter, command_name, Perm)
+    BotsLog.interlog(inter, command_name, Perm)
     await BotsCommand.users.add(inter, a, b)
 
 bot.run(TOKEN)

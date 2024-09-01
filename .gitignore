@@ -2,3 +2,5 @@
 venv
 restart_status.txt
 __pycache__
+Logs
+Logs/bot_logs.txt

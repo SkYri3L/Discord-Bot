@@ -1,7 +1,4 @@
-import os
-import sys
-import platform
-import discord
+import os, sys, platform, discord, datetime
 from discord import app_commands
 from discord.ext import commands
 
@@ -34,8 +31,13 @@ class BotsCommand:
 
         @staticmethod
         async def sync2(bot, ctx: commands.Context) -> None:
-            synced = await bot.tree.sync()
-            print(f"Synced {len(synced)} commands globally")
+            try:
+                synced = await bot.tree.sync()
+                await ctx.send(message=f"Synced {len(synced)} commands globally")
+                print(f"Synced {len(synced)} commands globally")
+            except Exception as e:
+                await ctx.send(message=f"Error Syncing commands: {e}")
+                print(f"Error Syncing commands: {e}")
 
         @staticmethod
         async def bot_restart(bot, inter: discord.Interaction) -> None:
@@ -52,6 +54,13 @@ class BotsCommand:
             else:
                 os.system("clear")
             os.execv(sys.executable, ['python'] + sys.argv) 
+        
+        #
+        @staticmethod
+        async def makerole(bot, inter: discord.Interaction, rname: str, rcolour: int) -> None:
+            inter.guild.create_role(name=rname, color=rcolour)
+
+        #
 
     class users:
         @staticmethod
@@ -64,21 +73,6 @@ class BotsCommand:
             await inter.response.send_message(f"Pong! {round(bot.latency * 1000)}ms")
             print(f"Ping is {round(bot.latency * 1000)}ms")
 
-
-# Get User ID and Username
-    @staticmethod
-    def interuserid(inter: discord.Interaction, command_name: str, Perm:str):
-        username = inter.user.name
-        user_id = inter.user.id
-        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}\nPerm:{Perm}')
-        return user_id, username
-    
-    @staticmethod
-    def ctxuserid(ctx: commands.Context, command_name:str, Perm:str):
-        user_id = ctx.message.author.id
-        username = ctx.message.author.name
-        print(f'Command: {command_name}\nUser: {username}\n ID: {user_id}\nPerm:{Perm}')
-        return user_id, username
 
 # NOT COMMANDS 
 async def change_status(bot) -> None:
